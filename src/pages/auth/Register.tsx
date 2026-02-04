@@ -34,86 +34,79 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center gradient-soft p-4">
+    <div className="min-h-screen flex items-center justify-center bg-radial p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md my-8"
       >
-        <Card className="p-8 shadow-large">
-          {/* Logo */}
-          <div className="flex justify-center mb-8">
-            <div className="w-16 h-16 rounded-2xl gradient-primary shadow-glow flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-          </div>
-
+        <Card className="p-10 shadow-large border-white/[0.05] bg-card/80 backdrop-blur-xl">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-            <p className="text-muted-foreground">Join SchoolPress today</p>
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold mb-3">Join <span className="text-primary">SchoolChamps</span></h1>
+            <p className="text-muted-foreground text-lg">Create your account to get started</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name" className="text-foreground/80 font-medium">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="name"
                   placeholder="John Doe"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="pl-10"
+                  className="pl-12 h-12 bg-background/50 border-white/[0.05] focus:ring-primary/50"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-foreground/80 font-medium">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@school.edu"
+                  placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10"
+                  className="pl-12 h-12 bg-background/50 border-white/[0.05] focus:ring-primary/50"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-foreground/80 font-medium">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="••••••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10"
+                  className="pl-12 h-12 bg-background/50 border-white/[0.05] focus:ring-primary/50"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">Account Type</Label>
+              <Label htmlFor="role" className="text-foreground/80 font-medium">Account Type</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-12 bg-background/50 border-white/[0.05]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-white/[0.05]">
                   <SelectItem value="school">School</SelectItem>
                   <SelectItem value="writer">Writer</SelectItem>
                   <SelectItem value="marketer">Digital Marketer</SelectItem>
@@ -122,38 +115,37 @@ export default function Register() {
             </div>
 
             {formData.role === 'school' && (
-              <div className="space-y-2">
-                <Label htmlFor="schoolName">School Name</Label>
+              <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <Label htmlFor="schoolName" className="text-foreground/80 font-medium">School Name</Label>
                 <div className="relative">
-                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="schoolName"
                     placeholder="Demo High School"
                     value={formData.schoolName}
                     onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
-                    className="pl-10"
+                    className="pl-12 h-12 bg-background/50 border-white/[0.05] focus:ring-primary/50"
                     required
                   />
                 </div>
               </div>
             )}
 
-            <Button type="submit" className="w-full group" size="lg" disabled={isLoading}>
+            <Button type="submit" className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary-light shadow-glow transform hover:scale-[1.02] transition-all mt-4" size="lg" disabled={isLoading}>
               {isLoading ? (
                 'Creating Account...'
               ) : (
                 <>
                   Create Account
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-smooth" />
                 </>
               )}
             </Button>
           </form>
 
           {/* Footer */}
-          <div className="mt-6 text-center text-sm text-muted-foreground">
+          <div className="mt-10 text-center text-sm text-foreground/60">
             Already have an account?{' '}
-            <a href="/login" className="text-primary hover:underline">
+            <a href="/login" className="text-primary font-semibold hover:underline">
               Sign in
             </a>
           </div>

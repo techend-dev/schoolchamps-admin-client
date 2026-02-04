@@ -25,7 +25,7 @@ export const Loader = () => {
             <Sparkles className="w-10 h-10 text-white" />
           </div>
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,7 +33,7 @@ export const Loader = () => {
           className="text-center"
         >
           <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
-            SchoolPress
+            SchoolChamps
           </h2>
           <p className="text-muted-foreground text-sm mt-1">Loading your workspace...</p>
         </motion.div>

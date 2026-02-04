@@ -8,6 +8,7 @@ import { adminService } from '@/lib/services/adminService';
 import { wordpressService } from '@/lib/services/wordpressService';
 import { useToast } from '@/hooks/use-toast';
 import { Loader } from '@/components/layout/Loader';
+import { cn } from '@/lib/utils';
 
 interface Overview {
   totalSchools: number;
@@ -116,12 +117,12 @@ export default function AdminDashboard() {
   const recentBlogs = blogs.slice(0, 5);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-muted-foreground">
-          Manage schools, users, and content across the platform
+        <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">Super Admin Dashboard</h1>
+        <p className="text-muted-foreground text-lg">
+          System-wide analytics and management
         </p>
       </div>
 
@@ -134,14 +135,11 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="p-6 shadow-soft hover:shadow-medium transition-smooth">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-xl bg-muted/50 ${stat.color}`}>
-                  <stat.icon className="h-6 w-6" />
+            <Card className="p-8 bg-card border-white/[0.05] shadow-medium hover:border-primary/20 transition-all duration-300">
+              <div className="flex flex-col gap-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                <div className="flex items-end justify-between">
+                  <p className="text-4xl font-extrabold text-white">{stat.value}</p>
                 </div>
               </div>
             </Card>
@@ -149,83 +147,89 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Pending Approval */}
-      {pendingBlogs.length > 0 && (
-        <Card className="p-6 shadow-soft">
-          <h2 className="text-2xl font-semibold mb-6">Pending Approval</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Blogs */}
+        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1">Recent Blogs</h2>
+              <p className="text-sm text-muted-foreground">Latest content across all schools</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={fetchData} className="hover:bg-white/5">
+              Refresh
+            </Button>
+          </div>
           <div className="space-y-4">
-            {pendingBlogs.map((blog, index) => (
+            {recentBlogs.map((blog, index) => (
               <motion.div
                 key={blog._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="p-5 rounded-xl border border-border bg-card"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-all group"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-lg">{blog.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {blog.schoolId?.name} • {new Date(blog.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Badge variant="secondary">Approved by School</Badge>
+                <div className="min-w-0">
+                  <p className="font-bold text-white truncate group-hover:text-primary transition-colors">{blog.title}</p>
+                  <p className="text-xs text-muted-foreground mt-1 font-medium">
+                    {blog.schoolId?.name || 'Unknown School'} • {new Date(blog.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => handlePublishToWordPress(blog._id)}
-                    disabled={publishingId === blog._id}
-                  >
-                    {publishingId === blog._id ? 'Publishing...' : 'Publish to WordPress'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleUpdateBlogStatus(blog._id, 'draft_writer')}
-                  >
-                    Send Back
-                  </Button>
-                </div>
+                <Badge className={cn(
+                  "ml-4 shrink-0 font-bold",
+                  blog.status === 'published_wp' ? "bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20" : "bg-primary/10 text-primary border-primary/20"
+                )}>
+                  {blog.status.replace('_', ' ').toUpperCase()}
+                </Badge>
               </motion.div>
             ))}
           </div>
         </Card>
-      )}
 
-      {/* Recent Activity */}
-      <Card className="p-6 shadow-soft">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-primary" />
-            Recent Blogs
-          </h2>
-          <Button variant="outline" size="sm" onClick={fetchData}>
-            Refresh
-          </Button>
-        </div>
-        <div className="space-y-4">
-          {recentBlogs.map((blog, index) => (
-            <motion.div
-              key={blog._id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-smooth"
-            >
-              <div>
-                <p className="font-medium">{blog.title}</p>
-                <p className="text-sm text-muted-foreground">
-                  {blog.schoolId?.name || 'Unknown'} • {new Date(blog.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <Badge variant={blog.status === 'published_wp' ? 'default' : 'secondary'}>
-                {blog.status.replace('_', ' ')}
-              </Badge>
-            </motion.div>
-          ))}
-        </div>
-      </Card>
+        {/* Pending Approval Section (Simplified/Redesigned) */}
+        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+          <h2 className="text-2xl font-bold text-white mb-8">Pending Approval</h2>
+          {pendingBlogs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-white/[0.05] rounded-2xl">
+              <CheckCircle className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
+              <p className="text-muted-foreground font-medium">All caught up! No pending approvals.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {pendingBlogs.map((blog, index) => (
+                <div
+                  key={blog._id}
+                  className="p-6 rounded-2xl bg-primary/5 border border-primary/10"
+                >
+                  <div className="mb-4">
+                    <h3 className="font-bold text-white text-lg">{blog.title}</h3>
+                    <p className="text-xs text-primary font-bold uppercase tracking-wider mt-1">
+                      {blog.schoolId?.name}
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button
+                      size="sm"
+                      className="bg-primary hover:bg-primary-light font-bold"
+                      onClick={() => handlePublishToWordPress(blog._id)}
+                      disabled={publishingId === blog._id}
+                    >
+                      {publishingId === blog._id ? 'Publishing...' : 'Publish Now'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-white/10 hover:bg-white/5 font-bold"
+                      onClick={() => handleUpdateBlogStatus(blog._id, 'draft_writer')}
+                    >
+                      Revision
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      </div>
     </div>
   );
 }

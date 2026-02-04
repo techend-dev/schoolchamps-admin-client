@@ -116,51 +116,52 @@ export default function SchoolDashboard() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-10">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold">School Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">School Dashboard</h1>
+          <p className="text-muted-foreground text-lg">
             Submit stories and manage your school's content
           </p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="gap-2">
-              <Plus className="h-5 w-5" />
+            <Button size="lg" className="h-14 px-8 text-lg font-bold bg-primary hover:bg-primary-light shadow-glow transform hover:scale-[1.02] transition-all gap-2">
+              <Plus className="h-6 w-6" />
               Submit Story
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] bg-card border-white/[0.05] backdrop-blur-xl">
             <form onSubmit={handleSubmit}>
               <DialogHeader>
-                <DialogTitle>Submit New Story</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-2xl font-bold text-white">Submit New Story</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
                   Share news, achievements, or events from your school
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-6 py-6">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="title" className="text-foreground/80 font-medium">Title *</Label>
                   <Input
                     id="title"
                     placeholder="e.g., Annual Sports Day Success"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="h-12 bg-background/50 border-white/[0.05] focus:ring-primary/50"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
+                  <Label htmlFor="category" className="text-foreground/80 font-medium">Category *</Label>
                   <Select
                     value={formData.category}
                     onValueChange={(value: any) => setFormData({ ...formData, category: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 bg-background/50 border-white/[0.05]">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-card border-white/[0.05]">
                       <SelectItem value="news">News</SelectItem>
                       <SelectItem value="achievement">Achievement</SelectItem>
                       <SelectItem value="event">Event</SelectItem>
@@ -170,35 +171,39 @@ export default function SchoolDashboard() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description" className="text-foreground/80 font-medium">Description *</Label>
                   <Textarea
                     id="description"
                     placeholder="Provide details about the story..."
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={5}
+                    className="bg-background/50 border-white/[0.05] focus:ring-primary/50 resize-none"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="attachments">Attachments (Images/Documents)</Label>
-                  <Input
-                    id="attachments"
-                    type="file"
-                    multiple
-                    accept="image/*,.pdf,.doc,.docx"
-                    onChange={(e) => setFiles(e.target.files)}
-                  />
-                  <p className="text-sm text-muted-foreground">
+                  <Label htmlFor="attachments" className="text-foreground/80 font-medium">Attachments (Images/Documents)</Label>
+                  <div className="relative">
+                    <Input
+                      id="attachments"
+                      type="file"
+                      multiple
+                      accept="image/*,.pdf,.doc,.docx"
+                      onChange={(e) => setFiles(e.target.files)}
+                      className="cursor-pointer bg-background/50 border-white/[0.05] h-auto py-3"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
                     Max 5 files, 5MB each
                   </p>
                 </div>
               </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <DialogFooter className="gap-2">
+                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="hover:bg-white/5">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary-light font-bold px-8">
                   {isSubmitting ? 'Submitting...' : 'Submit Story'}
                 </Button>
               </DialogFooter>
@@ -207,116 +212,127 @@ export default function SchoolDashboard() {
         </Dialog>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalSubmissions}</div>
-          </CardContent>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total Submissions</p>
+            <div className="flex items-end justify-between">
+              <p className="text-4xl font-extrabold text-white">{stats.totalSubmissions}</p>
+              <FileText className="h-8 w-8 text-primary opacity-20" />
+            </div>
+          </div>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.pendingReview}</div>
-          </CardContent>
+        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pending Review</p>
+            <div className="flex items-end justify-between">
+              <p className="text-4xl font-extrabold text-white">{stats.pendingReview}</p>
+              <Clock className="h-8 w-8 text-primary opacity-20" />
+            </div>
+          </div>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Published</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.published}</div>
-          </CardContent>
+        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+          <div className="flex flex-col gap-1">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Published</p>
+            <div className="flex items-end justify-between">
+              <p className="text-4xl font-extrabold text-white">{stats.published}</p>
+              <CheckCircle2 className="h-8 w-8 text-[#10b981] opacity-20" />
+            </div>
+          </div>
         </Card>
       </div>
 
-      {/* Submissions List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Submissions</CardTitle>
-          <CardDescription>Track the status of your submitted stories</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {submissions.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No submissions yet</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Click "Submit Story" to get started
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {submissions.map((submission) => (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Submissions List */}
+        <Card className="p-8 bg-card border-white/[0.05] shadow-medium flex flex-col h-full">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-1">Your Submissions</h2>
+            <p className="text-sm text-muted-foreground">Track the status of your submitted stories</p>
+          </div>
+          <div className="flex-1 space-y-4">
+            {submissions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-white/[0.05] rounded-2xl">
+                <FileText className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
+                <p className="text-muted-foreground font-medium">No submissions yet</p>
+                <Button variant="link" className="text-primary mt-2" onClick={() => setIsDialogOpen(true)}>
+                  Click to submit your first story
+                </Button>
+              </div>
+            ) : (
+              submissions.map((submission) => (
                 <div
                   key={submission._id}
-                  className="flex items-start justify-between p-4 rounded-lg border hover:bg-accent transition-colors"
+                  className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-all group"
                 >
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{submission.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {submission.description}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline">{submission.category}</Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(submission.createdAt).toLocaleDateString()}
-                      </span>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-white truncate group-hover:text-primary transition-colors">{submission.title}</h3>
+                      <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+                        {submission.description}
+                      </p>
+                      <div className="flex items-center gap-3 mt-4">
+                        <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider border-white/10 bg-white/5">
+                          {submission.category}
+                        </Badge>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                          {new Date(submission.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="shrink-0">
+                      {getStatusBadge(submission.status)}
                     </div>
                   </div>
-                  <div className="ml-4">
-                    {getStatusBadge(submission.status)}
-                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              ))
+            )}
+          </div>
+        </Card>
 
-      {/* Blogs for Review */}
-      {blogs.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Blogs for Review</CardTitle>
-            <CardDescription>Review and approve drafts created by writers</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {blogs.map((blog) => (
+        {/* Blogs for Review */}
+        <Card className="p-8 bg-card border-white/[0.05] shadow-medium flex flex-col h-full">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-1">Blogs for Review</h2>
+            <p className="text-sm text-muted-foreground">Review and approve drafts from writers</p>
+          </div>
+          <div className="flex-1 space-y-4">
+            {blogs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-white/[0.05] rounded-2xl">
+                <CheckCircle2 className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
+                <p className="text-muted-foreground font-medium">No blogs currently in review.</p>
+              </div>
+            ) : (
+              blogs.map((blog) => (
                 <div
                   key={blog._id}
-                  className="flex items-start justify-between p-4 rounded-lg border hover:bg-accent transition-colors"
+                  className="p-5 rounded-2xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-all group"
                 >
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{blog.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {blog.metaDescription}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline">{blog.category}</Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {blog.readingTime} min read
-                      </span>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-white group-hover:text-primary transition-colors">{blog.title}</h3>
+                      <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+                        {blog.metaDescription}
+                      </p>
+                      <div className="flex items-center gap-3 mt-4">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold uppercase tracking-wider">
+                          {blog.category}
+                        </Badge>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                          {blog.readingTime} min read
+                        </span>
+                      </div>
                     </div>
+                    <Button variant="secondary" size="sm" className="bg-white text-black hover:bg-white/90 font-bold shrink-0">
+                      Review
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm">
-                    Review
-                  </Button>
                 </div>
-              ))}
-            </div>
-          </CardContent>
+              ))
+            )}
+          </div>
         </Card>
-      )}
+      </div>
     </div>
   );
 }

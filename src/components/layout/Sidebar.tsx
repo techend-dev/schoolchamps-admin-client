@@ -1,15 +1,17 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard,
+  Home,
   FileText,
-  Send,
+  BarChart3,
+  Bell,
   Wand2,
   Settings,
   LogOut,
   Menu,
   X,
   Sparkles,
+  Bolt,
 } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -25,9 +27,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    title: 'Dashboard',
+    title: 'Home',
     href: '/dashboard',
-    icon: LayoutDashboard,
+    icon: Home,
     roles: ['admin', 'writer', 'school', 'marketer'],
   },
   {
@@ -37,10 +39,16 @@ const navItems: NavItem[] = [
     roles: ['admin', 'writer', 'school', 'marketer'],
   },
   {
-    title: 'Submissions',
-    href: '/dashboard/submissions',
-    icon: Send,
-    roles: ['admin', 'writer', 'school'],
+    title: 'Analytics',
+    href: '/dashboard/analytics',
+    icon: BarChart3,
+    roles: ['admin', 'marketer'],
+  },
+  {
+    title: 'Notifications',
+    href: '/dashboard/notifications',
+    icon: Bell,
+    roles: ['admin', 'school'],
   },
   {
     title: 'AI Tools',
@@ -51,7 +59,7 @@ const navItems: NavItem[] = [
   {
     title: 'Settings',
     href: '/dashboard/settings',
-    icon: Settings,
+    icon: Bolt,
     roles: ['admin', 'writer', 'school', 'marketer'],
   },
 ];
@@ -86,62 +94,99 @@ export const Sidebar = () => {
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className={cn(
-          'fixed left-0 top-0 h-screen bg-card border-r border-border overflow-hidden z-40',
+          'fixed left-0 top-0 h-screen bg-sidebar-background border-r border-white/[0.05] overflow-hidden z-40',
           'lg:relative lg:opacity-100 lg:w-[280px]'
         )}
       >
-        <div className="flex flex-col h-full p-6">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl gradient-primary shadow-glow flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">SchoolPress</h1>
-              <p className="text-xs text-muted-foreground capitalize">{user?.role} Portal</p>
+        <div className="flex flex-col h-full">
+          {/* Logo Section */}
+          <div className="p-6 mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center p-2">
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain invert" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-white uppercase">SchoolChamps</h1>
+                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-[0.2em]">Empowering Schools</p>
+              </div>
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 space-y-2">
-            {filteredNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
+          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-8">
+            {/* Main Menu Section */}
+            <div>
+              <p className="px-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">MAIN MENU</p>
+              <nav className="space-y-1">
+                {filteredNavItems.filter(i => !['Settings'].includes(i.title)).map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.href;
 
-              return (
-                <NavLink
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-xl transition-smooth',
-                    'hover:bg-accent/50',
-                    isActive && 'bg-primary text-primary-foreground shadow-medium'
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="font-medium">{item.title}</span>
-                </NavLink>
-              );
-            })}
-          </nav>
-
-          {/* User info & logout */}
-          <div className="pt-6 border-t border-border">
-            <div className="mb-4 p-3 rounded-xl bg-muted/50">
-              <p className="text-sm font-medium">{user?.name}</p>
-              <p className="text-xs text-muted-foreground">{user?.email}</p>
-              {user?.schoolName && (
-                <p className="text-xs text-primary mt-1">{user.schoolName}</p>
-              )}
+                  return (
+                    <NavLink
+                      key={item.href}
+                      to={item.href}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
+                        isActive
+                          ? 'bg-primary text-white shadow-glow'
+                          : 'text-muted-foreground hover:text-white hover:bg-white/5'
+                      )}
+                    >
+                      <Icon className={cn("h-5 w-5", isActive ? "text-white" : "text-muted-foreground group-hover:text-white")} />
+                      <span className="font-semibold">{item.title}</span>
+                    </NavLink>
+                  );
+                })}
+              </nav>
             </div>
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-3"
-              onClick={logout}
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
+
+            {/* Account Section */}
+            <div>
+              <p className="px-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">ACCOUNT</p>
+              <nav className="space-y-1">
+                {filteredNavItems.filter(i => ['Settings'].includes(i.title)).map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.href;
+
+                  return (
+                    <NavLink
+                      key={item.href}
+                      to={item.href}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
+                        isActive
+                          ? 'bg-primary text-white shadow-glow'
+                          : 'text-muted-foreground hover:text-white hover:bg-white/5'
+                      )}
+                    >
+                      <Icon className={cn("h-5 w-5", isActive ? "text-white" : "text-muted-foreground group-hover:text-white")} />
+                      <span className="font-semibold">{item.title}</span>
+                    </NavLink>
+                  );
+                })}
+              </nav>
+            </div>
+          </div>
+
+          {/* User Profile Section */}
+          <div className="p-4 border-t border-white/[0.05]">
+            <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/5 border border-white/10 group">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold shrink-0">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-white truncate">{user?.name}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={logout}
+                className="p-2 rounded-lg hover:bg-white/10 text-muted-foreground hover:text-white transition-all flex-shrink-0"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </motion.aside>
