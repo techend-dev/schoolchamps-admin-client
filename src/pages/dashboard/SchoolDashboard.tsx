@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, FileText, CheckCircle2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { submissionService, Submission } from '@/lib/services/submissionService';
 import { blogService, Blog } from '@/lib/services/blogService';
-import { Loader } from '@/components/layout/Loader';
 
 export default function SchoolDashboard() {
+  const navigate = useNavigate();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -102,11 +103,15 @@ export default function SchoolDashboard() {
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.submitted_school;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    return <Badge variant={config.variant} className="w-full sm:w-auto justify-center">{config.label}</Badge>;
   };
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   const stats = {
@@ -118,17 +123,17 @@ export default function SchoolDashboard() {
   return (
     <div className="space-y-10">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">School Dashboard</h1>
-          <p className="text-muted-foreground text-lg">
-            Submit stories and manage your school's content
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 uppercase">School Dashboard</h1>
+          <p className="text-sm md:text-lg text-muted-foreground max-w-lg font-medium">
+            Submit stories and manage your school's digital presence
           </p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="h-14 px-8 text-lg font-bold bg-primary hover:bg-primary-light shadow-glow transform hover:scale-[1.02] transition-all gap-2">
-              <Plus className="h-6 w-6" />
+            <Button size="lg" className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg font-bold bg-primary hover:bg-primary-light shadow-glow transform hover:scale-[1.02] transition-all gap-2 w-full md:w-auto">
+              <Plus className="h-5 md:h-6 w-5 md:w-6" />
               Submit Story
             </Button>
           </DialogTrigger>
@@ -213,31 +218,37 @@ export default function SchoolDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <Card className="p-4 md:p-8 bg-card border-white/[0.05] shadow-medium transition-all hover:border-primary/20">
           <div className="flex flex-col gap-1">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Total Submissions</p>
+            <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Submissions</p>
             <div className="flex items-end justify-between">
-              <p className="text-4xl font-extrabold text-white">{stats.totalSubmissions}</p>
-              <FileText className="h-8 w-8 text-primary opacity-20" />
+              <p className="text-2xl md:text-4xl font-extrabold text-white">{stats.totalSubmissions}</p>
+              <div className="p-2 md:p-3 rounded-xl bg-primary/10 border border-primary/20">
+                <FileText className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+              </div>
             </div>
           </div>
         </Card>
-        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+        <Card className="p-4 md:p-8 bg-card border-white/[0.05] shadow-medium transition-all hover:border-primary/20">
           <div className="flex flex-col gap-1">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Pending Review</p>
+            <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Queue</p>
             <div className="flex items-end justify-between">
-              <p className="text-4xl font-extrabold text-white">{stats.pendingReview}</p>
-              <Clock className="h-8 w-8 text-primary opacity-20" />
+              <p className="text-2xl md:text-4xl font-extrabold text-white">{stats.pendingReview}</p>
+              <div className="p-2 md:p-3 rounded-xl bg-primary/10 border border-primary/20">
+                <Clock className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+              </div>
             </div>
           </div>
         </Card>
-        <Card className="p-8 bg-card border-white/[0.05] shadow-medium">
+        <Card className="p-4 md:p-8 bg-card border-white/[0.05] shadow-medium transition-all hover:border-[#10b981]/20">
           <div className="flex flex-col gap-1">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Published</p>
+            <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Live</p>
             <div className="flex items-end justify-between">
-              <p className="text-4xl font-extrabold text-white">{stats.published}</p>
-              <CheckCircle2 className="h-8 w-8 text-[#10b981] opacity-20" />
+              <p className="text-2xl md:text-4xl font-extrabold text-[#10b981]">{stats.published}</p>
+              <div className="p-2 md:p-3 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20">
+                <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-[#10b981]" />
+              </div>
             </div>
           </div>
         </Card>
@@ -245,10 +256,10 @@ export default function SchoolDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Submissions List */}
-        <Card className="p-8 bg-card border-white/[0.05] shadow-medium flex flex-col h-full">
+        <Card className="p-5 md:p-8 bg-card border-white/[0.05] shadow-medium flex flex-col h-full">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-1">Your Submissions</h2>
-            <p className="text-sm text-muted-foreground">Track the status of your submitted stories</p>
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-1">Your Submissions</h2>
+            <p className="text-xs md:text-sm text-muted-foreground">Track the status of your submitted stories</p>
           </div>
           <div className="flex-1 space-y-4">
             {submissions.length === 0 ? (
@@ -265,7 +276,7 @@ export default function SchoolDashboard() {
                   key={submission._id}
                   className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-all group"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div className="min-w-0">
                       <h3 className="font-bold text-white truncate group-hover:text-primary transition-colors">{submission.title}</h3>
                       <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
@@ -280,7 +291,7 @@ export default function SchoolDashboard() {
                         </span>
                       </div>
                     </div>
-                    <div className="shrink-0">
+                    <div className="shrink-0 w-full sm:w-auto">
                       {getStatusBadge(submission.status)}
                     </div>
                   </div>
@@ -291,10 +302,10 @@ export default function SchoolDashboard() {
         </Card>
 
         {/* Blogs for Review */}
-        <Card className="p-8 bg-card border-white/[0.05] shadow-medium flex flex-col h-full">
+        <Card className="p-5 md:p-8 bg-card border-white/[0.05] shadow-medium flex flex-col h-full">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-1">Blogs for Review</h2>
-            <p className="text-sm text-muted-foreground">Review and approve drafts from writers</p>
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-1">Blogs for Review</h2>
+            <p className="text-xs md:text-sm text-muted-foreground">Review and approve drafts from writers</p>
           </div>
           <div className="flex-1 space-y-4">
             {blogs.length === 0 ? (
@@ -308,7 +319,7 @@ export default function SchoolDashboard() {
                   key={blog._id}
                   className="p-5 rounded-2xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-all group"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div className="min-w-0">
                       <h3 className="font-bold text-white group-hover:text-primary transition-colors">{blog.title}</h3>
                       <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
@@ -323,7 +334,12 @@ export default function SchoolDashboard() {
                         </span>
                       </div>
                     </div>
-                    <Button variant="secondary" size="sm" className="bg-white text-black hover:bg-white/90 font-bold shrink-0">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="bg-white text-black hover:bg-white/90 font-bold shrink-0 w-full sm:w-auto"
+                      onClick={() => navigate(`/dashboard/blogs/${blog._id}`)}
+                    >
                       Review
                     </Button>
                   </div>

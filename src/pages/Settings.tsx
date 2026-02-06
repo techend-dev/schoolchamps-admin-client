@@ -111,31 +111,33 @@ export default function Settings() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div>
-                <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-                    <SettingsIcon className="h-10 w-10 text-primary" />
+            <div className="mb-8">
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 flex items-center gap-3">
+                    <SettingsIcon className="h-8 w-8 md:h-10 md:w-10 text-primary" />
                     Settings
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-sm md:text-lg text-muted-foreground max-w-lg">
                     Manage your account settings and preferences
                 </p>
             </div>
 
-            <Tabs defaultValue="profile" className="space-y-6">
-                <TabsList className="grid grid-cols-3 w-full max-w-md">
-                    <TabsTrigger value="profile" className="gap-2">
-                        <User className="h-4 w-4" />
-                        Profile
-                    </TabsTrigger>
-                    <TabsTrigger value="security" className="gap-2">
-                        <Shield className="h-4 w-4" />
-                        Security
-                    </TabsTrigger>
-                    <TabsTrigger value="notifications" className="gap-2">
-                        <Bell className="h-4 w-4" />
-                        Alerts
-                    </TabsTrigger>
-                </TabsList>
+            <Tabs defaultValue="profile" className="space-y-6 w-full">
+                <div className="overflow-x-auto no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                    <TabsList className="flex h-auto p-1 bg-muted/50 w-full md:max-w-md">
+                        <TabsTrigger value="profile" className="flex-1 py-2 text-xs md:text-sm gap-2">
+                            <User className="h-3.5 w-3.5" />
+                            Profile
+                        </TabsTrigger>
+                        <TabsTrigger value="security" className="flex-1 py-2 text-xs md:text-sm gap-2">
+                            <Shield className="h-3.5 w-3.5" />
+                            Security
+                        </TabsTrigger>
+                        <TabsTrigger value="notifications" className="flex-1 py-2 text-xs md:text-sm gap-2">
+                            <Bell className="h-3.5 w-3.5" />
+                            Alerts
+                        </TabsTrigger>
+                    </TabsList>
+                </div>
 
                 {/* Profile Tab */}
                 <TabsContent value="profile">
@@ -143,8 +145,8 @@ export default function Settings() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <Card className="p-6">
-                            <h2 className="text-xl font-semibold mb-6">Profile Information</h2>
+                        <Card className="p-4 md:p-8 bg-card border-white/[0.05] shadow-medium">
+                            <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Profile Information</h2>
 
                             <div className="space-y-6 max-w-md">
                                 <div className="space-y-2">
@@ -192,10 +194,10 @@ export default function Settings() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <Card className="p-6">
+                        <Card className="p-4 md:p-8 bg-card border-white/[0.05] shadow-medium">
                             <div className="flex items-center gap-3 mb-6">
                                 <Key className="h-6 w-6 text-primary" />
-                                <h2 className="text-xl font-semibold">Change Password</h2>
+                                <h2 className="text-xl md:text-2xl font-bold text-white">Change Password</h2>
                             </div>
 
                             <div className="space-y-6 max-w-md">
@@ -258,8 +260,8 @@ export default function Settings() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <Card className="p-6">
-                            <h2 className="text-xl font-semibold mb-6">Notification Preferences</h2>
+                        <Card className="p-4 md:p-8 bg-card border-white/[0.05] shadow-medium">
+                            <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Notification Preferences</h2>
 
                             <div className="space-y-6 max-w-md">
                                 <div className="flex items-center justify-between">

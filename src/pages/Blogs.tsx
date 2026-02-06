@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/tabs';
 import { blogService, Blog } from '@/lib/services/blogService';
 import { wordpressService } from '@/lib/services/wordpressService';
-import { Loader } from '@/components/layout/Loader';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 
@@ -213,36 +212,40 @@ export default function Blogs() {
   const canPublish = user?.role === 'admin' || user?.role === 'school';
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold mb-2">Blogs</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">Blogs</h1>
+        <p className="text-sm md:text-lg text-muted-foreground">
           View and manage all blog posts across different stages
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <p className="text-2xl font-bold">{allBlogs.length}</p>
-          <p className="text-sm text-muted-foreground">Total Blogs</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-3 md:p-4">
+          <p className="text-xl md:text-2xl font-bold">{allBlogs.length}</p>
+          <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">Total Blogs</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-2xl font-bold text-yellow-600">{draftsCount}</p>
-          <p className="text-sm text-muted-foreground">Drafts</p>
+        <Card className="p-3 md:p-4">
+          <p className="text-xl md:text-2xl font-bold text-yellow-600">{draftsCount}</p>
+          <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">Drafts</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-2xl font-bold text-orange-600">{reviewCount}</p>
-          <p className="text-sm text-muted-foreground">In Review</p>
+        <Card className="p-3 md:p-4">
+          <p className="text-xl md:text-2xl font-bold text-orange-600">{reviewCount}</p>
+          <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">In Review</p>
         </Card>
-        <Card className="p-4">
-          <p className="text-2xl font-bold text-green-600">{publishedCount}</p>
-          <p className="text-sm text-muted-foreground">Published</p>
+        <Card className="p-3 md:p-4">
+          <p className="text-xl md:text-2xl font-bold text-green-600">{publishedCount}</p>
+          <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">Published</p>
         </Card>
       </div>
 
@@ -264,12 +267,12 @@ export default function Blogs() {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="all">All ({allBlogs.length})</TabsTrigger>
-          <TabsTrigger value="drafts">Drafts ({draftsCount})</TabsTrigger>
-          <TabsTrigger value="review">In Review ({reviewCount})</TabsTrigger>
-          <TabsTrigger value="published">Published ({publishedCount})</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="w-full flex h-auto p-1 bg-muted/50 overflow-x-auto justify-start md:justify-center no-scrollbar">
+          <TabsTrigger value="all" className="flex-1 py-2 text-xs md:text-sm">All ({allBlogs.length})</TabsTrigger>
+          <TabsTrigger value="drafts" className="flex-1 py-2 text-xs md:text-sm">Drafts ({draftsCount})</TabsTrigger>
+          <TabsTrigger value="review" className="flex-1 py-2 text-xs md:text-sm">In Review ({reviewCount})</TabsTrigger>
+          <TabsTrigger value="published" className="flex-1 py-2 text-xs md:text-sm">Published ({publishedCount})</TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6">
@@ -293,24 +296,24 @@ export default function Blogs() {
                   transition={{ delay: index * 0.05 }}
                 >
                   <Card
-                    className={`p-6 hover:shadow-md transition-shadow ${blog.isWordPressOnly ? '' : 'cursor-pointer'}`}
+                    className={`p-4 md:p-6 hover:shadow-md transition-all duration-300 border-white/[0.05] hover:border-primary/30 ${blog.isWordPressOnly ? '' : 'cursor-pointer'}`}
                     onClick={() => !blog.isWordPressOnly && navigate(`/dashboard/blogs/${blog._id}`)}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold">{blog.title}</h3>
+                    <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-3 flex-wrap">
+                          <h3 className="text-base md:text-lg font-bold leading-tight group-hover:text-primary transition-colors">{blog.title}</h3>
                           {getStatusBadge(blog.status, blog.isWordPressOnly)}
                         </div>
-                        <p className="text-muted-foreground line-clamp-2 mb-3">
+                        <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-4 opacity-90">
                           {blog.description || 'No description available'}
                         </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>Category: {blog.category}</span>
-                          <span>•</span>
-                          <span>{blog.readingTime} min read</span>
-                          <span>•</span>
-                          <span>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] md:text-xs text-muted-foreground">
+                          <span className="bg-white/5 py-0.5 px-2 rounded-md">Category: {blog.category}</span>
+                          <span className="hidden md:inline">•</span>
+                          <span className="bg-white/5 py-0.5 px-2 rounded-md">{blog.readingTime} min read</span>
+                          <span className="hidden md:inline">•</span>
+                          <span className="bg-white/5 py-0.5 px-2 rounded-md">
                             {new Date(blog.createdAt).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
@@ -319,17 +322,17 @@ export default function Blogs() {
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 ml-4">
+                      <div className="flex items-center gap-2 w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-border/50">
                         {/* Publish Button - for platform blogs only */}
                         {canPublish && !blog.isWordPressOnly && blog.status !== 'published_wp' && (
                           <Button
                             size="sm"
-                            className="gap-1"
+                            className="gap-2 flex-1 md:flex-none font-bold"
                             onClick={(e) => handlePublishToWordPress(blog._id, e)}
                             disabled={publishingId === blog._id}
                           >
                             <Upload className="h-4 w-4" />
-                            {publishingId === blog._id ? 'Publishing...' : 'Publish'}
+                            <span>{publishingId === blog._id ? 'Publishing...' : 'Publish'}</span>
                           </Button>
                         )}
 
@@ -339,11 +342,12 @@ export default function Blogs() {
                             href={blog.wordpressUrl}
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="flex-1 md:flex-none"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <Button size="sm" variant="outline" className="gap-1">
+                            <Button size="sm" variant="outline" className="gap-2 w-full font-bold">
                               <ExternalLink className="h-4 w-4" />
-                              View
+                              <span>View</span>
                             </Button>
                           </a>
                         )}
@@ -353,6 +357,7 @@ export default function Blogs() {
                           <Button
                             size="sm"
                             variant="outline"
+                            className="md:flex-none"
                             onClick={(e) => {
                               e.stopPropagation();
                               navigate(`/dashboard/blogs/${blog._id}`);
@@ -366,6 +371,7 @@ export default function Blogs() {
                           <Button
                             size="sm"
                             variant="destructive"
+                            className="md:flex-none"
                             onClick={(e) => handleDeleteBlog(blog._id, e)}
                           >
                             <Trash2 className="h-4 w-4" />

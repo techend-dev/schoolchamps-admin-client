@@ -58,4 +58,11 @@ export const blogService = {
     const response = await api.delete(`/blogs/${id}`);
     return response;
   },
+
+  async uploadImage(id: string, formData: FormData) {
+    const response = await api.post(`/blogs/${id}/image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response;
+  },
 };

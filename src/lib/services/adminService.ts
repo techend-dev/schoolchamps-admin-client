@@ -33,4 +33,14 @@ export const adminService = {
     const response = await api.put(`/admin/users/${userId}/toggle-active`);
     return response.data.user;
   },
+
+  async createUser(userData: any) {
+    const response = await api.post('/admin/users', userData);
+    return response.data;
+  },
+
+  async resetPassword(userId: string, password: string) {
+    const response = await api.post(`/admin/users/${userId}/reset-password`, { password });
+    return response.data;
+  },
 };

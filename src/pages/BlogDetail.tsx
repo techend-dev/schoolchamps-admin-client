@@ -16,7 +16,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { blogService, Blog } from '@/lib/services/blogService';
 import { wordpressService } from '@/lib/services/wordpressService';
-import { Loader } from '@/components/layout/Loader';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 
@@ -104,7 +103,11 @@ export default function BlogDetail() {
     const canPublish = (user?.role === 'admin' || user?.role === 'school') && blog?.status !== 'published_wp';
 
     if (loading) {
-        return <Loader />;
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
     if (!blog) {
@@ -182,30 +185,32 @@ export default function BlogDetail() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
             >
-                <div className="flex items-start justify-between gap-4 mb-4">
-                    <h1 className="text-4xl font-bold">{blog.title}</h1>
-                    {getStatusBadge(blog.status)}
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                    <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">{blog.title}</h1>
+                    <div className="w-fit">
+                        {getStatusBadge(blog.status)}
+                    </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs md:text-sm text-muted-foreground font-medium uppercase tracking-wider">
+                    <span className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-primary" />
                         {new Date(blog.createdAt).toLocaleDateString('en-US', {
                             month: 'long',
                             day: 'numeric',
                             year: 'numeric'
                         })}
                     </span>
-                    <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
+                    <span className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-primary" />
                         {blog.readingTime || 5} min read
                     </span>
-                    <span className="flex items-center gap-1">
-                        <Tag className="h-4 w-4" />
+                    <span className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-primary" />
                         {blog.category || 'General'}
                     </span>
                     {school && (
-                        <span>School: {school.name}</span>
+                        <span className="px-2 py-0.5 bg-white/5 rounded border border-white/10">School: {school.name}</span>
                     )}
                 </div>
             </motion.div>
@@ -295,9 +300,9 @@ export default function BlogDetail() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
             >
-                <Card className="p-8">
+                <Card className="p-5 md:p-10 bg-card border-white/[0.05] shadow-medium">
                     <div
-                        className="prose prose-lg max-w-none dark:prose-invert"
+                        className="prose prose-sm md:prose-lg max-w-none dark:prose-invert prose-p:leading-relaxed prose-headings:text-white"
                         dangerouslySetInnerHTML={{ __html: blog.content }}
                     />
                 </Card>

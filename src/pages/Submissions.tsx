@@ -8,7 +8,8 @@ import {
     AlertCircle,
     Eye,
     Trash2,
-    Sparkles
+    Sparkles,
+    Calendar
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,6 @@ import {
 import { submissionService, Submission } from '@/lib/services/submissionService';
 import { aiService } from '@/lib/services/aiService';
 import { useToast } from '@/hooks/use-toast';
-import { Loader } from '@/components/layout/Loader';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Submissions() {
@@ -171,7 +171,11 @@ export default function Submissions() {
     };
 
     if (loading) {
-        return <Loader />;
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
     const canCreateSubmission = user?.role === 'school' || user?.role === 'admin';
@@ -181,10 +185,10 @@ export default function Submissions() {
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl font-bold mb-2">Submissions</h1>
-                    <p className="text-muted-foreground">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-2">Submissions</h1>
+                    <p className="text-sm md:text-lg text-muted-foreground max-w-lg">
                         Manage school story submissions and generate AI blog drafts
                     </p>
                 </div>
@@ -254,54 +258,54 @@ export default function Submissions() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="p-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                            <FileText className="h-5 w-5 text-blue-600" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="p-3 md:p-4">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+                            <FileText className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                         </div>
-                        <div>
-                            <p className="text-2xl font-bold">{submissions.length}</p>
-                            <p className="text-sm text-muted-foreground">Total</p>
+                        <div className="min-w-0">
+                            <p className="text-xl md:text-2xl font-bold truncate">{submissions.length}</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">Total</p>
                         </div>
                     </div>
                 </Card>
-                <Card className="p-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-yellow-100 rounded-lg">
-                            <Clock className="h-5 w-5 text-yellow-600" />
+                <Card className="p-3 md:p-4">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="p-2 bg-yellow-100 rounded-lg shrink-0">
+                            <Clock className="h-4 w-4 md:h-5 md:w-5 text-yellow-600" />
                         </div>
-                        <div>
-                            <p className="text-2xl font-bold">
+                        <div className="min-w-0">
+                            <p className="text-xl md:text-2xl font-bold truncate">
                                 {submissions.filter(s => s.status === 'submitted_school').length}
                             </p>
-                            <p className="text-sm text-muted-foreground">Pending</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">Pending</p>
                         </div>
                     </div>
                 </Card>
-                <Card className="p-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                            <Sparkles className="h-5 w-5 text-purple-600" />
+                <Card className="p-3 md:p-4">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="p-2 bg-purple-100 rounded-lg shrink-0">
+                            <Sparkles className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
                         </div>
-                        <div>
-                            <p className="text-2xl font-bold">
+                        <div className="min-w-0">
+                            <p className="text-xl md:text-2xl font-bold truncate">
                                 {submissions.filter(s => s.status === 'draft_created').length}
                             </p>
-                            <p className="text-sm text-muted-foreground">Drafts</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">Drafts</p>
                         </div>
                     </div>
                 </Card>
-                <Card className="p-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                            <CheckCircle className="h-5 w-5 text-green-600" />
+                <Card className="p-3 md:p-4">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="p-2 bg-green-100 rounded-lg shrink-0">
+                            <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
                         </div>
-                        <div>
-                            <p className="text-2xl font-bold">
+                        <div className="min-w-0">
+                            <p className="text-xl md:text-2xl font-bold truncate">
                                 {submissions.filter(s => s.status === 'published_wp').length}
                             </p>
-                            <p className="text-sm text-muted-foreground">Published</p>
+                            <p className="text-[10px] md:text-sm text-muted-foreground uppercase font-semibold">Published</p>
                         </div>
                     </div>
                 </Card>
@@ -334,33 +338,32 @@ export default function Submissions() {
                             transition={{ delay: index * 0.05 }}
                         >
                             <Card className="p-6 hover:shadow-md transition-shadow">
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <h3 className="text-lg font-semibold">{submission.title}</h3>
-                                            {getCategoryBadge(submission.category)}
-                                            {getStatusBadge(submission.status)}
+                                <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                            <h3 className="text-base md:text-lg font-bold leading-tight">{submission.title}</h3>
+                                            <div className="flex gap-1.5 flex-wrap">
+                                                {getCategoryBadge(submission.category)}
+                                                {getStatusBadge(submission.status)}
+                                            </div>
                                         </div>
-                                        <p className="text-muted-foreground line-clamp-2 mb-3">
+                                        <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-4 opacity-90">
                                             {submission.description}
                                         </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            Created: {new Date(submission.createdAt).toLocaleDateString('en-US', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
-                                        </p>
+                                        <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground bg-white/5 py-1 px-2 rounded-md w-fit">
+                                            <Calendar className="h-3 w-3" />
+                                            {new Date(submission.createdAt).toLocaleDateString()}
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2 ml-4">
+                                    <div className="flex items-center gap-2 w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-border/50">
                                         <Button
                                             size="sm"
                                             variant="outline"
+                                            className="flex-1 md:flex-none"
                                             onClick={() => setSelectedSubmission(submission)}
                                         >
                                             <Eye className="h-4 w-4" />
+                                            <span className="ml-2 md:hidden">View</span>
                                         </Button>
 
                                         {canGenerateDraft && submission.status === 'submitted_school' && (
@@ -368,10 +371,10 @@ export default function Submissions() {
                                                 size="sm"
                                                 onClick={() => handleGenerateDraft(submission._id)}
                                                 disabled={generatingDraft === submission._id}
-                                                className="gap-1"
+                                                className="gap-2 flex-1 md:flex-none bg-primary hover:bg-primary-light"
                                             >
                                                 <Sparkles className="h-4 w-4" />
-                                                {generatingDraft === submission._id ? 'Generating...' : 'Generate Draft'}
+                                                <span>{generatingDraft === submission._id ? 'Gen' : 'Generate'}</span>
                                             </Button>
                                         )}
 
@@ -379,6 +382,7 @@ export default function Submissions() {
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
+                                                className="md:flex-none"
                                                 onClick={() => handleDeleteSubmission(submission._id)}
                                             >
                                                 <Trash2 className="h-4 w-4" />

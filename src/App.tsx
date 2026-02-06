@@ -13,6 +13,11 @@ import Submissions from "./pages/Submissions";
 import AITools from "./pages/AITools";
 import Settings from "./pages/Settings";
 import BlogDetail from "./pages/BlogDetail";
+import BlogEditor from "./pages/BlogEditor";
+import Analytics from "./pages/Analytics";
+import Notifications from "./pages/Notifications";
+import Approvals from "./pages/Approvals";
+import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,8 +39,13 @@ const App = () => {
                 <Route index element={<Dashboard />} />
                 <Route path="blogs" element={<Blogs />} />
                 <Route path="blogs/:id" element={<BlogDetail />} />
+                <Route path="blogs/:id/edit" element={<BlogEditor />} />
                 <Route path="submissions" element={<Submissions />} />
                 <Route path="ai-tools" element={<AITools />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="approvals" element={<Approvals />} />
+                <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
 

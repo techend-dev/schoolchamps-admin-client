@@ -1,5 +1,4 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Home,
   FileText,
@@ -12,6 +11,8 @@ import {
   X,
   Sparkles,
   Bolt,
+  CheckSquare,
+  Users as UsersIcon,
 } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,18 @@ const navItems: NavItem[] = [
     roles: ['admin', 'writer', 'school', 'marketer'],
   },
   {
+    title: 'Review',
+    href: '/dashboard/approvals',
+    icon: CheckSquare,
+    roles: ['admin', 'writer'],
+  },
+  {
+    title: 'Users',
+    href: '/dashboard/users',
+    icon: UsersIcon,
+    roles: ['admin'],
+  },
+  {
     title: 'Analytics',
     href: '/dashboard/analytics',
     icon: BarChart3,
@@ -64,10 +77,9 @@ const navItems: NavItem[] = [
   },
 ];
 
-export const Sidebar = () => {
+export const Sidebar = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (open: boolean) => void }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(true);
 
   const filteredNavItems = navItems.filter((item) =>
     user?.role ? item.roles.includes(user.role) : false
@@ -75,35 +87,28 @@ export const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile toggle */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-md z-[60] lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{
-          width: isOpen ? 280 : 0,
-          opacity: isOpen ? 1 : 0,
-        }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
+      <aside
         className={cn(
-          'fixed left-0 top-0 h-screen bg-sidebar-background border-r border-white/[0.05] overflow-hidden z-40',
-          'lg:relative lg:opacity-100 lg:w-[280px]'
+          'fixed left-0 top-0 h-screen w-[280px] bg-sidebar border-r border-white/10 z-[70] transition-transform duration-300 ease-in-out shadow-2xl',
+          'lg:relative lg:translate-x-0 lg:z-40 lg:shadow-none',
+          isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo Section */}
           <div className="p-6 mb-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center p-2">
-                <img src="/logo.png" alt="Logo" className="w-full h-full object-contain invert" />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center p-2">
+                <Sparkles className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-white uppercase">SchoolChamps</h1>
@@ -112,7 +117,7 @@ export const Sidebar = () => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-8">
+          <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-2 space-y-8">
             {/* Main Menu Section */}
             <div>
               <p className="px-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">MAIN MENU</p>
@@ -125,6 +130,7 @@ export const Sidebar = () => {
                     <NavLink
                       key={item.href}
                       to={item.href}
+                      onClick={() => setIsOpen(false)}
                       className={cn(
                         'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
                         isActive
@@ -152,6 +158,7 @@ export const Sidebar = () => {
                     <NavLink
                       key={item.href}
                       to={item.href}
+                      onClick={() => setIsOpen(false)}
                       className={cn(
                         'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group',
                         isActive
@@ -189,7 +196,7 @@ export const Sidebar = () => {
             </div>
           </div>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 };

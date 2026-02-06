@@ -97,39 +97,21 @@ export default function Register() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-foreground/80 font-medium">Account Type</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}
-              >
-                <SelectTrigger className="h-12 bg-background/50 border-white/[0.05]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card border-white/[0.05]">
-                  <SelectItem value="school">School</SelectItem>
-                  <SelectItem value="writer">Writer</SelectItem>
-                  <SelectItem value="marketer">Digital Marketer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {formData.role === 'school' && (
-              <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                <Label htmlFor="schoolName" className="text-foreground/80 font-medium">School Name</Label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="schoolName"
-                    placeholder="Demo High School"
-                    value={formData.schoolName}
-                    onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
-                    className="pl-12 h-12 bg-background/50 border-white/[0.05] focus:ring-primary/50"
-                    required
-                  />
-                </div>
+            {/* Only school registration is allowed from this page now */}
+            <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Label htmlFor="schoolName" className="text-foreground/80 font-medium">School Name</Label>
+              <div className="relative">
+                <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  id="schoolName"
+                  placeholder="Demo High School"
+                  value={formData.schoolName}
+                  onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
+                  className="pl-12 h-12 bg-background/50 border-white/[0.05] focus:ring-primary/50"
+                  required
+                />
               </div>
-            )}
+            </div>
 
             <Button type="submit" className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary-light shadow-glow transform hover:scale-[1.02] transition-all mt-4" size="lg" disabled={isLoading}>
               {isLoading ? (

@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { blogService } from '@/lib/services/blogService';
 import { aiService } from '@/lib/services/aiService';
 import { useToast } from '@/hooks/use-toast';
-import { Loader } from '@/components/layout/Loader';
 
 interface Blog {
   _id: string;
@@ -103,21 +102,25 @@ export default function MarketerDashboard() {
   };
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold mb-2">Marketer Dashboard</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">Marketer Dashboard</h1>
+        <p className="text-sm md:text-lg text-muted-foreground mr-lg">
           Amplify your content across social platforms
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {stats.map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -125,14 +128,14 @@ export default function MarketerDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="p-6 shadow-soft">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
+            <Card className="p-4 md:p-6 bg-card border-white/[0.05] shadow-medium">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] md:text-sm text-muted-foreground font-bold uppercase tracking-widest mb-1 truncate">{stat.label}</p>
+                  <p className="text-xl md:text-3xl font-extrabold text-white">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-xl bg-muted/50 ${stat.color}`}>
-                  <stat.icon className="h-6 w-6" />
+                <div className={`p-1.5 md:p-3 rounded-xl bg-white/5 border border-white/10 shrink-0 ${stat.color}`}>
+                  <stat.icon className="h-4 w-4 md:h-6 md:w-6" />
                 </div>
               </div>
             </Card>
@@ -141,9 +144,9 @@ export default function MarketerDashboard() {
       </div>
 
       {/* AI Caption Generator */}
-      <Card className="p-6 shadow-soft">
-        <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-          <Wand2 className="h-6 w-6 text-primary" />
+      <Card className="p-5 md:p-6 shadow-soft">
+        <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center gap-2">
+          <Wand2 className="h-5 w-5 md:h-6 md:w-6 text-primary" />
           AI Caption Generator
         </h2>
 
@@ -172,10 +175,10 @@ export default function MarketerDashboard() {
 
           <div>
             <label className="text-sm font-medium mb-2 block">Platform</label>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <Button
                 variant={selectedPlatform === 'instagram' ? 'default' : 'outline'}
-                className="gap-2"
+                className="gap-2 flex-1 sm:flex-none"
                 onClick={() => setSelectedPlatform('instagram')}
               >
                 <Instagram className="h-4 w-4" />
@@ -183,7 +186,7 @@ export default function MarketerDashboard() {
               </Button>
               <Button
                 variant={selectedPlatform === 'linkedin' ? 'default' : 'outline'}
-                className="gap-2"
+                className="gap-2 flex-1 sm:flex-none"
                 onClick={() => setSelectedPlatform('linkedin')}
               >
                 <Linkedin className="h-4 w-4" />
@@ -192,13 +195,13 @@ export default function MarketerDashboard() {
             </div>
           </div>
 
-          <Button 
-            className="gap-2" 
+          <Button
+            className="gap-2 w-full md:w-auto font-bold bg-primary hover:bg-primary-light h-11"
             onClick={handleGenerateCaption}
             disabled={generating || !selectedBlogId || !selectedPlatform}
           >
             <Wand2 className="h-4 w-4" />
-            {generating ? 'Generating...' : 'Generate Caption'}
+            <span>{generating ? 'Generating...' : 'Generate AI Caption'}</span>
           </Button>
 
           {generatedCaption && (

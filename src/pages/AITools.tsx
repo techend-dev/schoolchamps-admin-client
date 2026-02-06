@@ -26,7 +26,7 @@ import {
 import { aiService } from '@/lib/services/aiService';
 import { blogService, Blog } from '@/lib/services/blogService';
 import { useToast } from '@/hooks/use-toast';
-import { Loader } from '@/components/layout/Loader';
+import { cn } from '@/lib/utils';
 
 export default function AITools() {
     const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -37,12 +37,6 @@ export default function AITools() {
     const [generatedHashtags, setGeneratedHashtags] = useState<string[]>([]);
     const [generating, setGenerating] = useState(false);
     const [copied, setCopied] = useState(false);
-
-    // Content improvement
-    const [contentToImprove, setContentToImprove] = useState('');
-    const [instruction, setInstruction] = useState('');
-    const [improvedContent, setImprovedContent] = useState('');
-    const [improving, setImproving] = useState(false);
 
     const { toast } = useToast();
 
@@ -94,36 +88,6 @@ export default function AITools() {
         }
     };
 
-    const handleImproveContent = async () => {
-        if (!contentToImprove || !instruction) {
-            toast({
-                title: 'Error',
-                description: 'Please provide content and instructions',
-                variant: 'destructive',
-            });
-            return;
-        }
-
-        try {
-            setImproving(true);
-            const response = await aiService.improveContent(contentToImprove, instruction);
-            setImprovedContent(response.data.improvedContent);
-            toast({
-                title: 'Success',
-                description: 'Content improved!',
-            });
-        } catch (error: unknown) {
-            const err = error as { response?: { data?: { message?: string } } };
-            toast({
-                title: 'Error',
-                description: err.response?.data?.message || 'Failed to improve content',
-                variant: 'destructive',
-            });
-        } finally {
-            setImproving(false);
-        }
-    };
-
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
         setCopied(true);
@@ -145,198 +109,145 @@ export default function AITools() {
     };
 
     if (loading) {
-        return <Loader />;
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
     return (
-        <div className="space-y-8">
+        <div className="max-w-4xl mx-auto space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-                    <Sparkles className="h-10 w-10 text-primary" />
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2 flex items-center gap-3">
+                    <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-primary" />
                     AI Tools
                 </h1>
-                <p className="text-muted-foreground">
-                    Generate social media posts and improve your content with AI
+                <p className="text-sm md:text-lg text-muted-foreground max-w-lg">
+                    Generate social media posts from your published blogs
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Social Media Generator */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                >
-                    <Card className="p-6 h-full">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl">
-                                <Wand2 className="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-semibold">Social Media Generator</h2>
-                                <p className="text-sm text-muted-foreground">Create platform-specific captions</p>
-                            </div>
+            {/* Social Media Generator */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+            >
+                <Card className="p-4 md:p-8 bg-card border-white/[0.05] shadow-medium">
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="p-3 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl shadow-glow">
+                            <Wand2 className="h-6 w-6 text-white" />
                         </div>
+                        <div>
+                            <h2 className="text-xl md:text-2xl font-bold text-white">Social Media Generator</h2>
+                            <p className="text-xs md:text-sm text-muted-foreground">Create platform-specific captions</p>
+                        </div>
+                    </div>
 
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Select Published Blog</Label>
-                                <Select value={selectedBlog} onValueChange={setSelectedBlog}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Choose a blog..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {blogs.map((blog) => (
-                                            <SelectItem key={blog._id} value={blog._id}>
-                                                {blog.title}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Platform</Label>
-                                <div className="grid grid-cols-4 gap-2">
-                                    {(['instagram', 'linkedin', 'twitter', 'facebook'] as const).map((p) => (
-                                        <Button
-                                            key={p}
-                                            variant={platform === p ? 'default' : 'outline'}
-                                            className="flex flex-col gap-1 h-auto py-3"
-                                            onClick={() => setPlatform(p)}
-                                        >
-                                            {getPlatformIcon(p)}
-                                            <span className="text-xs capitalize">{p}</span>
-                                        </Button>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Select Published Blog</Label>
+                            <Select value={selectedBlog} onValueChange={setSelectedBlog}>
+                                <SelectTrigger className="h-12 bg-white/5 border-white/10">
+                                    <SelectValue placeholder="Choose a blog..." />
+                                </SelectTrigger>
+                                <SelectContent className="bg-card border-white/10">
+                                    {blogs.map((blog) => (
+                                        <SelectItem key={blog._id} value={blog._id}>
+                                            {blog.title}
+                                        </SelectItem>
                                     ))}
-                                </div>
-                            </div>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                            <Button
-                                className="w-full gap-2"
-                                onClick={handleGenerateSocialPost}
-                                disabled={generating || !selectedBlog}
-                            >
-                                {generating ? (
-                                    <>Generating...</>
-                                ) : (
-                                    <>
-                                        <Sparkles className="h-4 w-4" />
-                                        Generate Caption
-                                    </>
-                                )}
-                            </Button>
-
-                            {generatedCaption && (
-                                <div className="space-y-3 pt-4 border-t">
-                                    <div className="flex items-center justify-between">
-                                        <Label>Generated Caption</Label>
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => copyToClipboard(generatedCaption + '\n\n' + generatedHashtags.join(' '))}
-                                        >
-                                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                        </Button>
-                                    </div>
-                                    <div className="p-4 bg-muted rounded-lg">
-                                        <p className="whitespace-pre-wrap">{generatedCaption}</p>
-                                        {generatedHashtags.length > 0 && (
-                                            <p className="mt-3 text-primary">
-                                                {generatedHashtags.join(' ')}
-                                            </p>
+                        <div className="space-y-3">
+                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Platform</Label>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {(['instagram', 'linkedin', 'twitter', 'facebook'] as const).map((p) => (
+                                    <Button
+                                        key={p}
+                                        variant={platform === p ? 'default' : 'outline'}
+                                        className={cn(
+                                            "flex flex-col gap-1.5 h-auto py-3 border-white/10 transition-all",
+                                            platform === p ? "bg-primary shadow-glow" : "bg-white/5 hover:bg-white/10"
                                         )}
-                                    </div>
-                                </div>
+                                        onClick={() => setPlatform(p)}
+                                    >
+                                        <div className={cn(platform === p ? "text-white" : "text-primary")}>
+                                            {getPlatformIcon(p)}
+                                        </div>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">{p}</span>
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <Button
+                            className="w-full h-12 text-base font-bold bg-primary hover:bg-primary-light shadow-glow gap-2"
+                            onClick={handleGenerateSocialPost}
+                            disabled={generating || !selectedBlog}
+                        >
+                            {generating ? (
+                                <>Generating...</>
+                            ) : (
+                                <>
+                                    <Sparkles className="h-5 w-5" />
+                                    Generate Caption
+                                </>
                             )}
-                        </div>
-                    </Card>
-                </motion.div>
+                        </Button>
 
-                {/* Content Improver */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <Card className="p-6 h-full">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl">
-                                <FileText className="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-semibold">Content Improver</h2>
-                                <p className="text-sm text-muted-foreground">Enhance your writing with AI</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Content to Improve</Label>
-                                <Textarea
-                                    value={contentToImprove}
-                                    onChange={(e) => setContentToImprove(e.target.value)}
-                                    placeholder="Paste your content here..."
-                                    rows={4}
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Improvement Instructions</Label>
-                                <Textarea
-                                    value={instruction}
-                                    onChange={(e) => setInstruction(e.target.value)}
-                                    placeholder="e.g., Make it more engaging, Fix grammar, Shorten to 100 words..."
-                                    rows={2}
-                                />
-                            </div>
-
-                            <Button
-                                className="w-full gap-2"
-                                onClick={handleImproveContent}
-                                disabled={improving || !contentToImprove || !instruction}
-                            >
-                                {improving ? (
-                                    <>Improving...</>
-                                ) : (
-                                    <>
-                                        <ArrowRight className="h-4 w-4" />
-                                        Improve Content
-                                    </>
-                                )}
-                            </Button>
-
-                            {improvedContent && (
-                                <div className="space-y-3 pt-4 border-t">
-                                    <div className="flex items-center justify-between">
-                                        <Label>Improved Content</Label>
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => copyToClipboard(improvedContent)}
-                                        >
-                                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                        </Button>
-                                    </div>
-                                    <div className="p-4 bg-muted rounded-lg">
-                                        <p className="whitespace-pre-wrap">{improvedContent}</p>
-                                    </div>
+                        {generatedCaption && (
+                            <div className="space-y-4 pt-6 mt-6 border-t border-white/5">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Generated Caption</Label>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-8 gap-2 text-[10px] uppercase font-bold hover:bg-white/5"
+                                        onClick={() => copyToClipboard(generatedCaption + '\n\n' + generatedHashtags.join(' '))}
+                                    >
+                                        {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                                        {copied ? 'Copied' : 'Copy'}
+                                    </Button>
                                 </div>
-                            )}
-                        </div>
-                    </Card>
-                </motion.div>
-            </div>
+                                <div className="p-5 rounded-2xl bg-white/5 border border-white/10">
+                                    <p className="whitespace-pre-wrap leading-relaxed text-sm md:text-base">{generatedCaption}</p>
+                                    {generatedHashtags.length > 0 && (
+                                        <p className="mt-4 text-primary font-medium flex flex-wrap gap-2">
+                                            {generatedHashtags.map(tag => (
+                                                <span key={tag}>{tag}</span>
+                                            ))}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </Card>
+            </motion.div>
 
             {/* Tips Section */}
-            <Card className="p-6 bg-gradient-to-r from-primary/5 to-primary/10">
-                <h3 className="text-lg font-semibold mb-4">💡 Tips for Better Results</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                    <li>• For social media posts, published blogs with rich content generate better captions</li>
-                    <li>• Use specific instructions for content improvement (e.g., "make it formal" or "add more emotional appeal")</li>
-                    <li>• Each platform has optimal post lengths - Instagram captions can be longer, Twitter needs to be concise</li>
-                    <li>• Review and personalize AI-generated content before posting</li>
+            <Card className="p-6 md:p-8 bg-card border-white/[0.05] shadow-medium">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <span className="p-1.5 bg-yellow-500/10 rounded-lg">💡</span>
+                    Tips for Better Results
+                </h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                        "Published blogs with rich content generate better captions",
+                        "Each platform has optimal post lengths for higher engagement",
+                        "Instagram and LinkedIn posts benefit from longer descriptions",
+                        "Always review and personalize AI-generated content before posting"
+                    ].map((tip, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-muted-foreground leading-relaxed">
+                            <span className="text-primary font-bold">{i + 1}.</span>
+                            {tip}
+                        </li>
+                    ))}
                 </ul>
             </Card>
         </div>

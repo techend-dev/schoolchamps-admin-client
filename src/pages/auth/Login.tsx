@@ -33,13 +33,13 @@ export default function Login() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="p-10 shadow-large border-white/[0.05] bg-card/80 backdrop-blur-xl">
+        <Card className="p-6 sm:p-10 shadow-large border-white/[0.05] bg-card/80 backdrop-blur-xl">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold mb-3 flex items-center justify-center gap-2">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3 flex items-center justify-center gap-2">
               Welcome Back <span className="animate-bounce">👋</span>
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-sm sm:text-lg">
               Sign in to continue to <span className="text-primary font-semibold">SchoolChamps</span>
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="w-full group h-14 text-lg font-semibold bg-primary hover:bg-primary-light shadow-glow transform hover:scale-[1.02] transition-all"
+              className="w-full group h-12 sm:h-14 text-base sm:text-lg font-semibold bg-primary hover:bg-primary-light shadow-glow transform hover:scale-[1.02] transition-all"
               size="lg"
               disabled={isLoading}
             >
