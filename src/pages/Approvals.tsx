@@ -105,6 +105,13 @@ export default function Approvals() {
         }
     };
 
+    const getImageUrl = (path: string) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+        return `${baseUrl}/${path.replace(/\\/g, '/')}`;
+    };
+
     const stats = [
         { label: 'Pending Approval', value: blogs.length, icon: Clock },
     ];
@@ -180,7 +187,7 @@ export default function Approvals() {
                                     {blog.featuredImage && (
                                         <div className="xl:w-64 h-48 xl:h-auto overflow-hidden rounded-2xl shrink-0 border border-white/10">
                                             <img
-                                                src={blog.featuredImage}
+                                                src={getImageUrl(blog.featuredImage)}
                                                 alt={blog.title}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             />

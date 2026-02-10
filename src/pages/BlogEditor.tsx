@@ -25,6 +25,7 @@ import { paymentService } from '@/lib/services/paymentService';
 import { schoolService, School } from '@/lib/services/schoolService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
+import { cn } from '@/lib/utils';
 
 export default function BlogEditor() {
     const { id } = useParams<{ id: string }>();
@@ -262,6 +263,13 @@ export default function BlogEditor() {
         setBlog({ ...blog, seoKeywords: blog.seoKeywords?.filter(k => k !== keyword) });
     };
 
+    const getImageUrl = (path: string) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+        return `${baseUrl}/${path.replace(/\\/g, '/')}`;
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -423,7 +431,7 @@ export default function BlogEditor() {
                             {blog.featuredImage ? (
                                 <div className="relative group rounded-xl overflow-hidden border border-white/10">
                                     <img
-                                        src={blog.featuredImage}
+                                        src={getImageUrl(blog.featuredImage)}
                                         alt="Featured"
                                         className="w-full h-48 object-cover transition-transform group-hover:scale-105"
                                     />
@@ -468,6 +476,40 @@ export default function BlogEditor() {
                                 </div>
                             )}
                         </Card>
+
+                        {/* Submission Media */}
+                        {typeof blog.submissionId === 'object' && blog.submissionId?.attachments && blog.submissionId.attachments.length > 0 && (
+                            <Card className="p-4 md:p-6 bg-card border-white/[0.05] shadow-medium space-y-4">
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                                    <FileText className="h-4 w-4" />
+                                    Submission Media ({blog.submissionId.attachments.length})
+                                </h3>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {blog.submissionId.attachments.map((attachment: string, index: number) => (
+                                        <div
+                                            key={index}
+                                            className={cn(
+                                                "relative rounded-lg overflow-hidden border-2 transition-all cursor-pointer hover:opacity-80",
+                                                blog.featuredImage === attachment ? "border-primary" : "border-transparent"
+                                            )}
+                                            onClick={() => setBlog({ ...blog, featuredImage: attachment })}
+                                        >
+                                            <img
+                                                src={getImageUrl(attachment)}
+                                                alt={`Attachment ${index + 1}`}
+                                                className="w-full h-20 object-cover"
+                                            />
+                                            {blog.featuredImage === attachment && (
+                                                <div className="absolute top-1 right-1 bg-primary px-1 rounded shadow-lg">
+                                                    <span className="text-[8px] font-black text-white uppercase tracking-tighter">Featured</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                <p className="text-[10px] text-muted-foreground italic">Click an image to set it as featured.</p>
+                            </Card>
+                        )}
 
                         {/* Tags */}
                         <Card className="p-4 md:p-6 bg-card border-white/[0.05] shadow-medium space-y-4">
