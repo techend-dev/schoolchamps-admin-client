@@ -74,7 +74,7 @@ const navItems: NavItem[] = [
     title: 'AI Tools',
     href: '/dashboard/ai-tools',
     icon: Wand2,
-    roles: ['writer', 'marketer'],
+    roles: ['admin', 'writer', 'marketer'],
   },
   {
     title: 'Settings',
