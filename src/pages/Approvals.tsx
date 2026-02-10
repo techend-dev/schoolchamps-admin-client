@@ -234,7 +234,7 @@ export default function Approvals() {
                                                 Edit Content
                                             </Button>
 
-                                            {user?.role === 'admin' && (
+                                            {(user?.role === 'admin' || user?.role === 'writer') && (
                                                 <Button
                                                     onClick={() => handlePublish(blog._id)}
                                                     disabled={publishingId === blog._id || rejectingId === blog._id}
