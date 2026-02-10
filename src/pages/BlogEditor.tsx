@@ -20,6 +20,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { blogService, Blog } from '@/lib/services/blogService';
 import { aiService } from '@/lib/services/aiService';
+import { wordpressService } from '@/lib/services/wordpressService';
+import { paymentService } from '@/lib/services/paymentService';
+import { schoolService, School } from '@/lib/services/schoolService';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 
@@ -41,6 +44,8 @@ export default function BlogEditor() {
         category: '',
         seoKeywords: []
     });
+    const [school, setSchool] = useState<School | null>(null);
+    const [publishing, setPublishing] = useState(false);
 
     const [tagInput, setTagInput] = useState('');
     const [keywordInput, setKeywordInput] = useState('');
@@ -50,6 +55,21 @@ export default function BlogEditor() {
             fetchBlog();
         }
     }, [id]);
+
+    useEffect(() => {
+        if (user?.schoolId) {
+            fetchSchool();
+        }
+    }, [user?.schoolId]);
+
+    const fetchSchool = async () => {
+        try {
+            const data = await schoolService.getById(user!.schoolId!);
+            setSchool(data);
+        } catch (error) {
+            console.error('Error fetching school:', error);
+        }
+    };
 
     const fetchBlog = async () => {
         try {
@@ -97,6 +117,100 @@ export default function BlogEditor() {
             });
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handlePublish = async () => {
+        if (!id || !blog.assignedSchool) {
+            toast({
+                title: 'Error',
+                description: 'Blog must be assigned to a school before publishing',
+                variant: 'destructive'
+            });
+            return;
+        }
+
+        if (school && school.coins < 99 && user?.role !== 'admin') {
+            toast({
+                title: 'Insufficient Coins',
+                description: 'You need 99 coins to publish. Please buy credits.',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        try {
+            setPublishing(true);
+            // Save current changes first
+            await handleSave();
+
+            const response = await wordpressService.publishBlog(id);
+            toast({
+                title: 'Published!',
+                description: 'Your blog is now live on WordPress.',
+            });
+            navigate('/dashboard');
+        } catch (error: any) {
+            console.error('Error publishing blog:', error);
+            toast({
+                title: 'Publishing Failed',
+                description: error.response?.data?.message || 'Failed to publish to WordPress',
+                variant: 'destructive',
+            });
+        } finally {
+            setPublishing(false);
+        }
+    };
+
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
+    const handleBuyCredits = async () => {
+        const res = await loadRazorpay();
+        if (!res) {
+            toast({ title: 'Error', description: 'Razorpay SDK failed to load', variant: 'destructive' });
+            return;
+        }
+
+        try {
+            const { order } = await paymentService.createOrder();
+
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                amount: order.amount,
+                currency: order.currency,
+                name: 'SchoolChamps',
+                description: 'Purchase 99 Credits',
+                order_id: order.id,
+                handler: async (response: any) => {
+                    try {
+                        await paymentService.verifyPayment(response);
+                        toast({ title: 'Success', description: 'Credits added successfully!' });
+                        fetchSchool();
+                    } catch (err) {
+                        toast({ title: 'Error', description: 'Payment verification failed', variant: 'destructive' });
+                    }
+                },
+                prefill: {
+                    name: user?.name,
+                    email: user?.email,
+                },
+                theme: {
+                    color: '#0D9488',
+                },
+            };
+
+            const paymentObject = new (window as any).Razorpay(options);
+            paymentObject.open();
+        } catch (error) {
+            toast({ title: 'Error', description: 'Failed to initiate payment', variant: 'destructive' });
         }
     };
 
@@ -170,13 +284,24 @@ export default function BlogEditor() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
+                    {school && (
+                        <div className="hidden md:flex flex-col items-end mr-4">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Credits</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl font-bold text-primary">{school.coins}</span>
+                                <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20" onClick={handleBuyCredits}>
+                                    + ADD
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                     <Button variant="outline" className="gap-2 flex-1 md:flex-none h-11 border-white/10 font-bold" onClick={() => handleSave()} disabled={saving}>
                         <Save className="h-4 w-4" />
                         Save Draft
                     </Button>
-                    <Button className="gap-2 flex-1 md:flex-none h-11 bg-primary hover:bg-primary-light font-bold shadow-glow" onClick={() => handleSave('review')} disabled={saving}>
+                    <Button className="gap-2 flex-1 md:flex-none h-11 bg-primary hover:bg-primary-light font-bold shadow-glow" onClick={handlePublish} disabled={saving || publishing}>
                         <Send className="h-4 w-4" />
-                        Submit
+                        {publishing ? 'Publishing...' : 'Publish'}
                     </Button>
                 </div>
             </div>

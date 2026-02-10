@@ -18,6 +18,8 @@ import Analytics from "./pages/Analytics";
 import Notifications from "./pages/Notifications";
 import Approvals from "./pages/Approvals";
 import Users from "./pages/Users";
+import Credits from "./pages/Credits";
+import AdminCredits from "./pages/AdminCredits";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +48,8 @@ const App = () => {
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="approvals" element={<Approvals />} />
                 <Route path="users" element={<Users />} />
+                <Route path="admin/credits" element={<AdminCredits />} />
+                <Route path="credits" element={<Credits />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
 

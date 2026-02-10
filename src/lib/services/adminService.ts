@@ -43,4 +43,9 @@ export const adminService = {
     const response = await api.post(`/admin/users/${userId}/reset-password`, { password });
     return response.data;
   },
+
+  async getCreditAnalytics() {
+    const response = await api.get('/admin/credit-analytics');
+    return response.data;
+  },
 };

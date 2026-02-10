@@ -13,6 +13,7 @@ export interface School {
   isActive: boolean;
   logo?: string;
   website?: string;
+  coins: number;
 }
 
 export const schoolService = {

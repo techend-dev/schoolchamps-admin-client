@@ -13,6 +13,7 @@ import {
   Bolt,
   CheckSquare,
   Users as UsersIcon,
+  Coins,
 } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -58,6 +59,12 @@ const navItems: NavItem[] = [
     roles: ['admin', 'marketer'],
   },
   {
+    title: 'Credit Analytics',
+    href: '/dashboard/admin/credits',
+    icon: Coins,
+    roles: ['admin'],
+  },
+  {
     title: 'Notifications',
     href: '/dashboard/notifications',
     icon: Bell,
@@ -74,6 +81,12 @@ const navItems: NavItem[] = [
     href: '/dashboard/settings',
     icon: Bolt,
     roles: ['admin', 'writer', 'school', 'marketer'],
+  },
+  {
+    title: 'Credits',
+    href: '/dashboard/credits',
+    icon: Coins,
+    roles: ['school'],
   },
 ];
 
