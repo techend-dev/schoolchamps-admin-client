@@ -30,4 +30,14 @@ export const aiService = {
     const response = await api.post('/ai/improve-content', { content, instruction });
     return response;
   },
+
+  async generateUnifiedSocialPost(blogId: string) {
+    const response = await api.post(`/ai/generate-unified-social/${blogId}`);
+    return response;
+  },
+
+  async postToSocial(data: { blogId: string; caption: string; hashtags: string[]; platforms: string[] }) {
+    const response = await api.post('/ai/post-to-social', data);
+    return response;
+  },
 };
