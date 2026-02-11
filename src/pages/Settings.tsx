@@ -20,6 +20,7 @@ import {
     Unplug,
     Plug,
     Share2,
+    Plus,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,14 @@ import { cn } from '@/lib/utils';
 
 interface SocialAccountsStatus {
     facebook: { connected: boolean; pageId: string | null; source: string };
-    linkedin: { connected: boolean; personUrn: string | null; expiresAt: string | null; hasRefreshToken: boolean };
+    linkedin: {
+        connected: boolean;
+        personUrn: string | null;
+        orgUrn: string | null;
+        expiresAt: string | null;
+        hasRefreshToken: boolean;
+        metadata: { selectedPageName?: string };
+    };
     instagram: { connected: boolean; accountId: string | null };
 }
 
@@ -84,6 +92,12 @@ export default function Settings() {
     const [fbAccessToken, setFbAccessToken] = useState('');
     const [fbPageId, setFbPageId] = useState('');
     const [savingFb, setSavingFb] = useState(false);
+
+    // LinkedIn organization selection
+    const [organizations, setOrganizations] = useState<{ urn: string; name: string }[]>([]);
+    const [loadingPages, setLoadingPages] = useState(false);
+    const [showPageSelection, setShowPageSelection] = useState(false);
+    const [selectingPage, setSelectingPage] = useState<string | null>(null);
 
     useEffect(() => {
         if (isAdmin) {
@@ -212,6 +226,33 @@ export default function Settings() {
             toast({ title: 'Error', description: 'Refresh failed', variant: 'destructive' });
         } finally {
             setRefreshingTokens(false);
+        }
+    };
+
+    const fetchLinkedInPages = async () => {
+        try {
+            setLoadingPages(true);
+            setShowPageSelection(true);
+            const response = await aiService.getLinkedInPages();
+            setOrganizations(response.data.organizations || []);
+        } catch (error: any) {
+            toast({ title: 'Error', description: 'Failed to fetch LinkedIn pages', variant: 'destructive' });
+        } finally {
+            setLoadingPages(false);
+        }
+    };
+
+    const handleSelectLinkedInPage = async (orgUrn: string, orgName: string) => {
+        try {
+            setSelectingPage(orgUrn);
+            await aiService.selectLinkedInPage(orgUrn, orgName);
+            toast({ title: 'Page Selected', description: `Posts will now go to ${orgName}` });
+            setShowPageSelection(false);
+            fetchSocialStatus();
+        } catch (error: any) {
+            toast({ title: 'Error', description: 'Failed to select page', variant: 'destructive' });
+        } finally {
+            setSelectingPage(null);
         }
     };
 
@@ -643,22 +684,88 @@ export default function Settings() {
                                             </div>
 
                                             {socialStatus?.linkedin.connected && (
-                                                <div className="space-y-2">
-                                                    {socialStatus.linkedin.expiresAt && (
-                                                        <div className="flex items-center justify-between text-xs bg-white/5 rounded-lg px-3 py-2">
-                                                            <span className="text-muted-foreground">Token</span>
-                                                            <span className={cn(
-                                                                "font-semibold",
-                                                                formatExpiry(socialStatus.linkedin.expiresAt) === 'Expired' ? 'text-red-400' : 'text-emerald-400'
-                                                            )}>
-                                                                {formatExpiry(socialStatus.linkedin.expiresAt)}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {socialStatus.linkedin.hasRefreshToken && (
-                                                        <p className="text-[11px] text-emerald-400/70 flex items-center gap-1">
-                                                            <RefreshCw className="h-3 w-3" /> Auto-refresh enabled
-                                                        </p>
+                                                <div className="space-y-3">
+                                                    <div className="space-y-2">
+                                                        {socialStatus.linkedin.expiresAt && (
+                                                            <div className="flex items-center justify-between text-[11px] bg-white/5 rounded-lg px-2 py-1.5">
+                                                                <span className="text-muted-foreground uppercase tracking-wider font-bold">Token Health</span>
+                                                                <span className={cn(
+                                                                    "font-bold px-1.5 py-0.5 rounded",
+                                                                    formatExpiry(socialStatus.linkedin.expiresAt) === 'Expired' ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'
+                                                                )}>
+                                                                    {formatExpiry(socialStatus.linkedin.expiresAt)}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {socialStatus.linkedin.metadata.selectedPageName ? (
+                                                            <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                                                                <span className="text-[10px] text-primary uppercase font-black tracking-widest leading-none">Target Page</span>
+                                                                <span className="text-xs text-white font-bold leading-none">{socialStatus.linkedin.metadata.selectedPageName}</span>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10">
+                                                                <p className="text-[11px] text-yellow-500 font-bold">No page selected. Posts will go to your personal profile.</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="w-full text-xs font-bold border-white/10 hover:bg-white/5 gap-2"
+                                                        onClick={fetchLinkedInPages}
+                                                        disabled={loadingPages}
+                                                    >
+                                                        {loadingPages ? <Loader2 className="h-3 w-3 animate-spin" /> : <SettingsIcon className="h-3 w-3" />}
+                                                        Manage Target Page
+                                                    </Button>
+
+                                                    {showPageSelection && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, scale: 0.95 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            className="absolute inset-x-0 bottom-0 bg-background/95 backdrop-blur-sm border-t border-white/10 p-4 z-10 max-h-full overflow-y-auto custom-scrollbar"
+                                                        >
+                                                            <div className="flex items-center justify-between mb-3">
+                                                                <h4 className="text-xs font-black uppercase text-white tracking-wider">Select Page</h4>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6 rounded-full hover:bg-white/10"
+                                                                    onClick={() => setShowPageSelection(false)}
+                                                                >
+                                                                    <XCircle className="h-4 w-4 text-muted-foreground" />
+                                                                </Button>
+                                                            </div>
+                                                            <div className="space-y-1.5">
+                                                                {organizations.length === 0 ? (
+                                                                    <p className="text-[11px] text-muted-foreground text-center py-4">No managed pages found.</p>
+                                                                ) : (
+                                                                    organizations.map(org => (
+                                                                        <button
+                                                                            key={org.urn}
+                                                                            onClick={() => handleSelectLinkedInPage(org.urn, org.name)}
+                                                                            disabled={selectingPage === org.urn}
+                                                                            className={cn(
+                                                                                "w-full text-left p-2.5 rounded-lg text-xs font-bold transition-all border flex items-center justify-between group",
+                                                                                socialStatus.linkedin.orgUrn === org.urn
+                                                                                    ? "bg-primary/20 border-primary/30 text-primary"
+                                                                                    : "bg-white/2 border-white/5 text-muted-foreground hover:bg-white/5 hover:border-white/10"
+                                                                            )}
+                                                                        >
+                                                                            <span className="truncate pr-2">{org.name}</span>
+                                                                            {selectingPage === org.urn ? (
+                                                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                                            ) : socialStatus.linkedin.orgUrn === org.urn ? (
+                                                                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                                                            ) : (
+                                                                                <Plus className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                            )}
+                                                                        </button>
+                                                                    ))
+                                                                )}
+                                                            </div>
+                                                        </motion.div>
                                                     )}
                                                 </div>
                                             )}

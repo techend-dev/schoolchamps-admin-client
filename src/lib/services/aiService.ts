@@ -67,4 +67,14 @@ export const aiService = {
     const baseUrl = import.meta.env.VITE_API_URL || 'https://api.schoolchamps.in';
     return `${baseUrl}/api/ai/linkedin/auth`;
   },
+
+  async getLinkedInPages() {
+    const response = await api.get('/ai/social-accounts/linkedin/pages');
+    return response;
+  },
+
+  async selectLinkedInPage(orgUrn: string, orgName: string) {
+    const response = await api.post('/ai/social-accounts/linkedin/select-page', { orgUrn, orgName });
+    return response;
+  },
 };
