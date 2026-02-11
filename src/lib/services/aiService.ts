@@ -40,4 +40,31 @@ export const aiService = {
     const response = await api.post('/ai/post-to-social', data);
     return response;
   },
+
+  // Social Accounts Management
+  async getSocialAccountsStatus() {
+    const response = await api.get('/ai/social-accounts/status');
+    return response;
+  },
+
+  async saveFacebookCredentials(accessToken: string, pageId: string) {
+    const response = await api.post('/ai/social-accounts/facebook', { accessToken, pageId });
+    return response;
+  },
+
+  async disconnectSocialAccount(platform: string) {
+    const response = await api.delete(`/ai/social-accounts/${platform}`);
+    return response;
+  },
+
+  async triggerTokenRefresh() {
+    const response = await api.post('/ai/token-refresh');
+    return response;
+  },
+
+  getLinkedInAuthUrl() {
+    // This returns the backend URL that redirects to LinkedIn OAuth
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://api.schoolchamps.in';
+    return `${baseUrl}/api/ai/linkedin/auth`;
+  },
 };
